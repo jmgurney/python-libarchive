@@ -34,14 +34,13 @@ except ImportError:
     from distutils.core import setup, Extension
     from distutils.command.build_ext import build_ext
 
-
-name = 'python-libarchive'
-version = '4.2.0'
-release = '1'
-versrel = version + '-' + release
+import libarchive
+name = 'python-libarchive-ext'
+version = libarchive._libarchive.ARCHIVE_VERSION_STRING.split(' ')[1]
+versrel = version
 readme = 'README.rst'
-download_url = "http://" + name + ".googlecode.com/files/" + name + "-" + \
-                                                          versrel + ".tar.gz"
+repourl = 'https://github.com/Vadiml1024/python-libarchive'
+download_url = repourl + '/tarball/extended'
 long_description = open(readme).read()
 
 class build_ext_extra(build_ext, object):
@@ -98,9 +97,9 @@ setup(name = name,
       long_description = long_description,
       license = 'BSD-style license',
       platforms = ['any'],
-      author = 'Ben Timby, Travis Cunningham, Ryan Johnston, SmartFile',
-      author_email = 'tcunningham@smartfile.com',
-      url = 'https://github.com/smartfile/python-libarchive',
+      author = 'Vadim Lebedev, Ben Timby, Travis Cunningham, Ryan Johnston, SmartFile',
+      author_email = 'vadiml1024@gmail.com',
+      url = repourl,
       download_url = download_url,
       packages = ['libarchive'],
       classifiers = [
