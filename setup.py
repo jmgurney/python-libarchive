@@ -93,7 +93,7 @@ __libarchive = Extension(name='libarchive.__libarchive',
 
 setup(name = name,
       version = versrel,
-      description = 'A libarchive wrapper for Python.',
+      description = 'A libarchive wrapper for Python supporting password protection.',
       long_description = long_description,
       license = 'BSD-style license',
       platforms = ['any'],
