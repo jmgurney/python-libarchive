@@ -544,9 +544,11 @@ class Archive(object):
             if getattr(self.f, 'closed', False):
                 return
             # Flush it if not read-only...
-            if self.f.mode != 'r' and self.f.mode != 'rb':
-                self.f.flush()
-                os.fsync(self.f.fileno())
+            if hasattr(self.f, "mode") and self.f.mode != 'r' and self.f.mode != 'rb':
+                if hasattr(self.f, "flush"):
+                    self.f.flush()
+                if hasattr(self.f, "fileno"): 
+                    os.fsync(self.f.fileno())
             # and then close it, if we opened it...
             if getattr(self, '_close', None):
                 self.f.close()
