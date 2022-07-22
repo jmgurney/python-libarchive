@@ -158,8 +158,10 @@ def is_archive(f, formats=(None, ), filters=(None, )):
 
     This function will return True if the file can be opened as an archive using the given
     format(s)/filter(s).'''
+    need_close : bool = False
     if isinstance(f, str):
         f = open(f, 'r')
+        need_close = True
     a = _libarchive.archive_read_new()
     for format in formats:
         format = get_func(format, FORMATS, 0)
@@ -180,7 +182,8 @@ def is_archive(f, formats=(None, ), filters=(None, )):
     finally:
         _libarchive.archive_read_close(a)
         _libarchive.archive_read_free(a)
-        f.close()
+        if need_close:
+            f.close()
 
 
 class EntryReadStream(object):
