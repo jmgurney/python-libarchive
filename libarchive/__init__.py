@@ -160,7 +160,7 @@ def is_archive(f, formats=(None, ), filters=(None, )):
     format(s)/filter(s).'''
     need_close : bool = False
     if isinstance(f, str):
-        f = open(f, 'r')
+        f = open(f, 'rb')
         need_close = True
     a = _libarchive.archive_read_new()
     for format in formats:
