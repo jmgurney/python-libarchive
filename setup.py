@@ -34,29 +34,36 @@ except ImportError:
     from distutils.core import setup, Extension
     from distutils.command.build_ext import build_ext
 
-import libarchive
+import subprocess
+
+# retreive the version number form SWIG generated file
+cmd = [
+    'awk',
+    '/ARCHIVE_VERSION_NUMBER/ { if (match($0,"[[:digit:]]+")) print substr($0, RSTART,RLENGTH) }',
+    "libarchive/_libarchive_wrap.c",
+]
+p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+vnum = int(p.stdout)
+
 name = 'python-libarchive-ext'
-version = libarchive._libarchive.ARCHIVE_VERSION_STRING.split(' ')[1]
+version = '{}.{}.{}'.format(vnum // 1000000, (vnum // 1000) % 100, vnum % 100)
 versrel = version
 readme = 'README.rst'
 repourl = 'https://github.com/Vadiml1024/python-libarchive'
-download_url = repourl + '/tarball/extended'
+repobranch = 'extended'
+download_url = repourl + f'/tarball/{repobranch}'
 long_description = open(readme).read()
+
 
 class build_ext_extra(build_ext, object):
     """
     Extend build_ext allowing extra_compile_args and extra_link_args to be set
     on the command-line.
     """
+
     user_options = build_ext.user_options
-    user_options.append(
-        ('extra-compile-args=', None,
-         'Extra arguments passed directly to the compiler')
-        )
-    user_options.append(
-        ('extra-link-args=', None,
-         'Extra arguments passed directly to the linker')
-        )
+    user_options.append(('extra-compile-args=', None, 'Extra arguments passed directly to the compiler'))
+    user_options.append(('extra-link-args=', None, 'Extra arguments passed directly to the linker'))
 
     def initialize_options(self):
         build_ext.initialize_options(self)
@@ -76,43 +83,44 @@ libarchivePrefix = environ.get('LIBARCHIVE_PREFIX')
 if libarchivePrefix:
     extra_compile_args = ['-I{0}/include'.format(libarchivePrefix)]
     extra_link_args = ['-Wl,-rpath={0}/lib'.format(libarchivePrefix)]
-    environ['LDFLAGS'] = '-L{0}/lib {1}'.format(libarchivePrefix,
-                                                environ.get('LDFLAGS', ''))
+    environ['LDFLAGS'] = '-L{0}/lib {1}'.format(libarchivePrefix, environ.get('LDFLAGS', ''))
 else:
     extra_compile_args = []
     extra_link_args = ['-l:libarchive.so.13']
 
-__libarchive = Extension(name='libarchive.__libarchive',
-                        sources=['libarchive/_libarchive_wrap.c'],
-                        libraries=['archive'],
-                        extra_compile_args=extra_compile_args,
-                        extra_link_args=extra_link_args,
-                        include_dirs=['libarchive'],
-                        )
+__libarchive = Extension(
+    name='libarchive.__libarchive',
+    sources=['libarchive/_libarchive_wrap.c'],
+    libraries=['archive'],
+    extra_compile_args=extra_compile_args,
+    extra_link_args=extra_link_args,
+    include_dirs=['libarchive'],
+)
 
 
-setup(name = name,
-      version = versrel,
-      description = 'A libarchive wrapper for Python supporting password protection.',
-      long_description = long_description,
-      license = 'BSD-style license',
-      platforms = ['any'],
-      author = 'Vadim Lebedev, Ben Timby, Travis Cunningham, Ryan Johnston, SmartFile',
-      author_email = 'vadiml1024@gmail.com',
-      url = repourl,
-      download_url = download_url,
-      packages = ['libarchive'],
-      classifiers = [
-          'Development Status :: 4 - Beta',
-          'Intended Audience :: Developers',
-          'Operating System :: OS Independent',
-          'Programming Language :: C',
-          'Programming Language :: Python',
-          'Topic :: System :: Archiving :: Compression',
-          'Topic :: Software Development :: Libraries :: Python Modules',
-      ],
-      cmdclass = {
+setup(
+    name=name,
+    version=versrel,
+    description='A libarchive wrapper for Python supporting password protection.',
+    long_description=long_description,
+    license='BSD-style license',
+    platforms=['any'],
+    author='Vadim Lebedev, Ben Timby, Travis Cunningham, Ryan Johnston, SmartFile',
+    author_email='vadiml1024@gmail.com',
+    url=repourl,
+    download_url=download_url,
+    packages=['libarchive'],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Operating System :: OS Independent',
+        'Programming Language :: C',
+        'Programming Language :: Python',
+        'Topic :: System :: Archiving :: Compression',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
+    cmdclass={
         'build_ext': build_ext_extra,
-      },
-      ext_modules = [__libarchive],
-      )
+    },
+    ext_modules=[__libarchive],
+)
