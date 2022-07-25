@@ -29,12 +29,12 @@ import sys
 import time
 import warnings
 
-#from ctypes import cdll, c_char_p
+# from ctypes import cdll, c_char_p
 
 from libarchive import _libarchive
 from io import StringIO
 
-#PY3 = sys.version_info[0] == 3
+# PY3 = sys.version_info[0] == 3
 PY3 = True
 
 # Suggested block size for libarchive. Libarchive may adjust it.
@@ -91,6 +91,7 @@ FILTER_EXTENSIONS = {
 class EOF(Exception):
     '''Raised by ArchiveInfo.from_archive() when unable to read the next
     archive header.'''
+
     pass
 
 
@@ -145,7 +146,7 @@ def is_archive_name(filename, formats=None):
         return format
 
 
-def is_archive(f, formats=(None, ), filters=(None, )):
+def is_archive(f, formats=(None,), filters=(None,)):
     '''Check to see if the given file is actually an archive. The format parameter
     can be used to specify which archive format is acceptable. If ommitted, all supported
     archive formats will be checked. It opens the file using libarchive. If no error is
@@ -158,7 +159,7 @@ def is_archive(f, formats=(None, ), filters=(None, )):
 
     This function will return True if the file can be opened as an archive using the given
     format(s)/filter(s).'''
-    need_close : bool = False
+    need_close: bool = False
     if isinstance(f, str):
         f = open(f, 'rb')
         need_close = True
@@ -188,6 +189,7 @@ def is_archive(f, formats=(None, ), filters=(None, )):
 
 class EntryReadStream(object):
     '''A file-like object for reading an entry from the archive.'''
+
     def __init__(self, archive, size):
         self.archive = archive
         self.closed = False
@@ -247,6 +249,7 @@ class EntryWriteStream(object):
     If the size is known ahead of time and provided, then the file contents
     are not buffered but flushed directly to the archive. If size is omitted,
     then the file contents are buffered and flushed in the close() method.'''
+
     def __init__(self, archive, pathname, size=None):
         self.archive = archive
         self.entry = Entry(pathname=pathname, mtime=time.time(), mode=stat.S_IFREG)
@@ -301,9 +304,10 @@ class EntryWriteStream(object):
 
 class Entry(object):
     '''An entry within an archive. Represents the header data and it's location within the archive.'''
+
     def __init__(self, pathname=None, size=None, mtime=None, mode=None, hpos=None, encoding=ENCODING):
 
-        #, symlink=None
+        # , symlink=None
         self.pathname = pathname
         self.size = size
         self.mtime = mtime
@@ -313,9 +317,9 @@ class Entry(object):
 
         self.symlink = ""
 
-        #if self.issym() and symlink:
+        # if self.issym() and symlink:
         #    self.symlink = symlink
-        #else:
+        # else:
         #    self.symlink = None
 
     @property
@@ -402,8 +406,8 @@ class Entry(object):
 
             call_and_check(_libarchive.archive_write_header, archive._a, archive._a, e)
 
-            #todo
-            #self.hpos = archive.header_position
+            # todo
+            # self.hpos = archive.header_position
         finally:
             _libarchive.archive_entry_free(e)
 
@@ -429,8 +433,18 @@ class Entry(object):
 class Archive(object):
     '''A low-level archive reader which provides forward-only iteration. Consider
     this a light-weight pythonic libarchive wrapper.'''
-    def __init__(self, f, mode='r', format=None, filter=None, entry_class=Entry, 
-        encoding=ENCODING, blocksize=BLOCK_SIZE, password=None):
+
+    def __init__(
+        self,
+        f,
+        mode='r',
+        format=None,
+        filter=None,
+        entry_class=Entry,
+        encoding=ENCODING,
+        blocksize=BLOCK_SIZE,
+        password=None,
+    ):
         assert mode in ('r', 'w', 'wb', 'a'), 'Mode should be "r", "w", "wb", or "a".'
         self._stream = None
         self.encoding = encoding
@@ -550,7 +564,7 @@ class Archive(object):
             if hasattr(self.f, "mode") and self.f.mode != 'r' and self.f.mode != 'rb':
                 if hasattr(self.f, "flush"):
                     self.f.flush()
-                if hasattr(self.f, "fileno"): 
+                if hasattr(self.f, "fileno"):
                     os.fsync(self.f.fileno())
             # and then close it, if we opened it...
             if getattr(self, '_close', None):
@@ -637,7 +651,7 @@ class Archive(object):
     def add_passphrase(self, password):
         '''Adds a password to the archive.'''
         _libarchive.archive_read_add_passphrase(self._a, password)
-    
+
     def set_passphrase(self, password):
         '''Sets a password for the archive.'''
         _libarchive.archive_write_set_passphrase(self._a, password)
@@ -649,6 +663,7 @@ class SeekableArchive(Archive):
     occur when reading archive entries in the order in which they appear in the archive.
     Reading out of order will cause the archive to be closed and opened each time a
     reverse seek is needed.'''
+
     def __init__(self, f, **kwargs):
         self._stream = None
         # Convert file to open file. We need this to reopen the archive.

@@ -4,7 +4,7 @@ from zipfile import ZIP_STORED, ZIP_DEFLATED
 
 
 def is_zipfile(filename):
-    return is_archive(filename, formats=('zip', ))
+    return is_archive(filename, formats=('zip',))
 
 
 class ZipEntry(Entry):
@@ -63,13 +63,15 @@ class ZipEntry(Entry):
 
 class ZipFile(SeekableArchive):
     def __init__(self, f, mode='r', compression=ZIP_DEFLATED, allowZip64=False, password=None):
-        super(ZipFile, self).__init__(f, mode=mode, format='zip', entry_class=ZipEntry, encoding='CP437', password=password)
+        super(ZipFile, self).__init__(
+            f, mode=mode, format='zip', entry_class=ZipEntry, encoding='CP437', password=password
+        )
         if mode == 'w' and compression == ZIP_STORED:
             # Disable compression for writing.
             _libarchive.archive_write_set_format_option(self.archive._a, "zip", "compression", "store")
         self.compression = compression
 
-    getinfo     = SeekableArchive.getentry
+    getinfo = SeekableArchive.getentry
 
     def namelist(self):
         return list(self.iterpaths())
