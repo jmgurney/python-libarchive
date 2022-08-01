@@ -59,6 +59,8 @@ jobs:
 
     - name: Build wheels
       run: |
+        export LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH
+        export LIBARCHIVE_PREFIX=/usr/local
         python3 -m pip wheel --wheel-dir dist/ .
         auditwheel repair dist/*.whl
         python3 -m pip install --force-reinstall wheelhouse/*.whl
