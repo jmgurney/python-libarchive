@@ -51,14 +51,14 @@ jobs:
       run: |
         rm -rf build wheelhouse
         touch libarchive/_libarchive.i
-        make clean
         export LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH
-        make install
+        export LIBARCHIVE_PREFIX=/usr/local
+        python3 setup.py install
 
 
     - name: Build wheels
       run: |
-        make wheel
+        pip wheel --wheel-dir dist/ .
         auditwheel repair dist/*.whl
         python3 -m pip install --force-reinstall wheelhouse/*,whl
 

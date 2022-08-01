@@ -36,13 +36,22 @@ except ImportError:
 
 import subprocess
 
+
+# Use a provided libarchive else default to hard-coded path.
+libarchivePrefix = environ.get('LIBARCHIVE_PREFIX')
+
+includePath = f"{libarchivePrefix or '/usr'}/include"
 # retreive the version number form SWIG generated file
+print("includePath:", (libarchivePrefix, includePath))
+
 cmd = [
     'awk',
-    '/ARCHIVE_VERSION_NUMBER/ { if (match($0,"[[:digit:]]+")) print substr($0, RSTART,RLENGTH) }',
-    "libarchive/_libarchive_wrap.c",
+    '/#define.*ARCHIVE_VERSION_NUMBER/ { if (match($0,"[[:digit:]]+")) print substr($0, RSTART,RLENGTH) }',
+    f"{includePath}/archive.h"
 ]
+
 p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+print("awk output:", p.stdout.decode('utf-8'))
 vnum = int(p.stdout)
 
 name = 'python-libarchive-ext'
@@ -78,8 +87,6 @@ class build_ext_extra(build_ext, object):
         super(build_ext_extra, self).build_extension(ext)
 
 
-# Use a provided libarchive else default to hard-coded path.
-libarchivePrefix = environ.get('LIBARCHIVE_PREFIX')
 if libarchivePrefix:
     extra_compile_args = ['-I{0}/include'.format(libarchivePrefix)]
     extra_link_args = ['-Wl,-rpath={0}/lib'.format(libarchivePrefix)]
@@ -90,7 +97,7 @@ else:
 
 __libarchive = Extension(
     name='libarchive.__libarchive',
-    sources=['libarchive/_libarchive.i', 'libarchive/_libarchive_wrap.c'],
+    sources=['libarchive/_libarchive.i'],
     libraries=['archive'],
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
