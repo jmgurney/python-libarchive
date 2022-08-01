@@ -7,7 +7,7 @@ on:
       - extended
 
 jobs:
-  Manylinux-Wheels:
+    name: manylinux-wheels:
     runs-on: ubuntu-latest
     container: quay.io/pypa/manylinux2014_x86_64
     steps:
@@ -40,7 +40,7 @@ jobs:
     - name: Build libarchive C sources
       run: |
         git clone  git clone https://github.com/libarchive/libarchive.git libarchive-src    
-        cd libarchive-src; git checkout 3-5
+        cd libarchive-src; git checkout 3.5
         mkdir build; cd build
         cmake ../
         make -j$(nproc);  make install
