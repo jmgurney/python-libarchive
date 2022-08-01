@@ -29,7 +29,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        yum install -y libxml2-devel libzstd-devl liblz4-devel liblzma-devel libbzip2-devel
+        yum install -y libxml2-devel libzstd-devel liblz4-devel liblzma-devel libbzip2-devel
         yum install -y libacl-devel librichacl-devel openssl-devel
         yum install -y librichacl-devel swig strace
 
