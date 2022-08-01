@@ -65,4 +65,10 @@ jobs:
         auditwheel repair dist/*.whl
         python3 -m pip install --force-reinstall wheelhouse/*.whl
 
+    - uses: actions/upload-artifact@v3
+      with:
+        name: python_libarchive_ext-3.5.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        path: ./wheelhouse/python_libarchive_ext-3.5.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+
+
     
