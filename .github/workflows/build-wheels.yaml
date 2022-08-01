@@ -7,7 +7,7 @@ on:
       - extended
 
 jobs:
-    name: manylinux-wheels:
+    name: manylinux-wheels
     runs-on: ubuntu-latest
     container: quay.io/pypa/manylinux2014_x86_64
     steps:
