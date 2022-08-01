@@ -35,7 +35,7 @@ jobs:
 
     - name: Install python tools
       run: |
-        python3 -m pip instal pytest auditwheel
+        python3 -m pip install pytest auditwheel
 
     
     - name: Build libarchive C sources
@@ -59,8 +59,8 @@ jobs:
 
     - name: Build wheels
       run: |
-        pip wheel --wheel-dir dist/ .
+        pyhton -m pip wheel --wheel-dir dist/ .
         auditwheel repair dist/*.whl
-        python3 -m pip install --force-reinstall wheelhouse/*,whl
+        python3 -m pip install --force-reinstall wheelhouse/*.whl
 
     
