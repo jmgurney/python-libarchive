@@ -59,7 +59,7 @@ jobs:
 
     - name: Build wheels
       run: |
-        pyhton -m pip wheel --wheel-dir dist/ .
+        python3 -m pip wheel --wheel-dir dist/ .
         auditwheel repair dist/*.whl
         python3 -m pip install --force-reinstall wheelhouse/*.whl
 
