@@ -29,8 +29,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        yum install -y libxml2-devel libzstd-devel xz-devel libbzip2-devel
-        yum install -y libacl-devel librichacl-devel openssl-devel
+        yum install -y libxml2-devel libzstd-devel xz-devel bzip2-devel
+        yum install -y libacl-devel openssl-devel
         yum install -y librichacl-devel swig strace
 
     - name: Install python tools
