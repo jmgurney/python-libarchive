@@ -66,8 +66,9 @@ jobs:
         auditwheel repair dist/*.whl
         python3 -m pip install --force-reinstall wheelhouse/*.whl
 
-    - name:  Minit test
+    - name:  Mini test
       run: |
+        cd /tmp
         strace -e open,openat python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])' \
            | tee strace.out
            
