@@ -20,6 +20,7 @@ jobs:
         cat /etc/issue
         echo "Shell: $SHELL"
         echo "Mount points:"; mount
+        echo "nproc: $( nproc )"
         env
 
     - name: Chose Python version
@@ -67,7 +68,7 @@ jobs:
 
     - name: version
       run: |
-        echo "::set-output name=version::$(python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])'')"
+        echo "::set-output name=version::$(python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])')"
       id: version
 
     - uses: actions/upload-artifact@v3
