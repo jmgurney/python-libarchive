@@ -66,11 +66,17 @@ jobs:
         auditwheel repair dist/*.whl
         python3 -m pip install --force-reinstall wheelhouse/*.whl
 
+    - name  Minit test
+        run: |
+           strace -e open,openat python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])' \
+           | tee strace.out
+           
     - name: version
       run: |
         export LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH
         export LIBARCHIVE_PREFIX=/usr/local
-        echo "::set-output name=version::$(python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])')"
+
+        echo "::set-output name=version::$(cd /; python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])')"
       id: version
 
     - uses: actions/upload-artifact@v3
