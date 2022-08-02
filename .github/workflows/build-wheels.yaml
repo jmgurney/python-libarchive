@@ -12,6 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     container: quay.io/pypa/manylinux2014_x86_64
     steps:
+    - name: Status
+      run: |
+        git status
+        ls -lR
+        
     - uses: actions/checkout@v2
 
     - name: Print System Information
@@ -69,8 +74,9 @@ jobs:
     - name:  Mini test
       run: |
         cd /tmp
-        strace -e open,openat python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])' \
+        python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])' \
            | tee strace.out
+        
            
     - name: version
       run: |
