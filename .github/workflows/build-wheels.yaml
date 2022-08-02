@@ -65,10 +65,35 @@ jobs:
         auditwheel repair dist/*.whl
         python3 -m pip install --force-reinstall wheelhouse/*.whl
 
+    - name: version
+      run: |
+        echo "::set-output name=version::$(python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])'')"
+      id: version
+
     - uses: actions/upload-artifact@v3
       with:
-        name: python_libarchive_ext-3.5.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-        path: ./wheelhouse/python_libarchive_ext-3.5.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        name: python_libarchive_ext-${{ steps.version.outputs.version }}-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        path: ./wheelhouse/python_libarchive_ext-${{ steps.version.outputs.version }}-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
 
 
+    - name: release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: ${{ steps.version.outputs.version }}
+        tag_name: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: upload artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./wheelhouse/python_libarchive_ext-${{ steps.version.outputs.version }}-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        asset_name: python_libarchive_ext-${{ steps.version.outputs.version }}-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        asset_content_type: application/zip
     
