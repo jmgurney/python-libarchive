@@ -420,10 +420,11 @@ extern void	archive_entry_set_perm(struct archive_entry *, __LA_MODE_T);
 extern int		 archive_errno(struct archive *);
 extern const char	*archive_error_string(struct archive *);
 
+extern int archive_version_number(void);
+extern const char *archive_version_string(void);
 
 /* CONSTANTS */
-#define	ARCHIVE_VERSION_NUMBER 3002002
-#define	ARCHIVE_VERSION_STRING "libarchive 3.2.2"
+
 #define	ARCHIVE_EOF	  1	/* Found end of archive. */
 #define	ARCHIVE_OK	  0	/* Operation was successful. */
 #define	ARCHIVE_RETRY	(-10)	/* Retry might succeed. */

@@ -7275,6 +7275,32 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_archive_version_number(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "archive_version_number", 0, 0, 0)) SWIG_fail;
+  result = (int)archive_version_number();
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_archive_version_string(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "archive_version_string", 0, 0, 0)) SWIG_fail;
+  result = (char *)archive_version_string();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_archive_read_data_into_str(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   struct archive *arg1 = (struct archive *) 0 ;
@@ -7479,6 +7505,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "archive_entry_set_perm", _wrap_archive_entry_set_perm, METH_VARARGS, NULL},
 	 { "archive_errno", _wrap_archive_errno, METH_O, NULL},
 	 { "archive_error_string", _wrap_archive_error_string, METH_O, NULL},
+	 { "archive_version_number", _wrap_archive_version_number, METH_NOARGS, NULL},
+	 { "archive_version_string", _wrap_archive_version_string, METH_NOARGS, NULL},
 	 { "archive_read_data_into_str", _wrap_archive_read_data_into_str, METH_VARARGS, NULL},
 	 { "archive_write_data_from_str", _wrap_archive_write_data_from_str, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
@@ -8280,8 +8308,6 @@ SWIG_init(void) {
   
   SWIG_InstallConstants(d,swig_const_table);
   
-  SWIG_Python_SetConstant(d, "ARCHIVE_VERSION_NUMBER",SWIG_From_int((int)(3002002)));
-  SWIG_Python_SetConstant(d, "ARCHIVE_VERSION_STRING",SWIG_FromCharPtr("libarchive 3.2.2"));
   SWIG_Python_SetConstant(d, "ARCHIVE_EOF",SWIG_From_int((int)(1)));
   SWIG_Python_SetConstant(d, "ARCHIVE_OK",SWIG_From_int((int)(0)));
   SWIG_Python_SetConstant(d, "ARCHIVE_RETRY",SWIG_From_int((int)((-10))));
