@@ -12,11 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     container: quay.io/pypa/manylinux2014_x86_64
     steps:
-    - name: Status
-      run: |
-        git status
-        ls -lR
-        
     - uses: actions/checkout@v2
 
     - name: Print System Information
@@ -74,9 +69,11 @@ jobs:
     - name:  Mini test
       run: |
         cd /tmp
-        python3 -c 'import libarchive;  print(libarchive._libarchive.ARCHIVE_VERSION_STRING.split()[1])' \
+        python3 -c 'import libarchive;  print(libarchive.version())' \
            | tee strace.out
-        
+        find / -name 'libarchive*.so' | xargs ls -l
+        find / -name 'libarchive*.so' | xargs strings | grep 'libarchive'
+      
            
     - name: version
       run: |

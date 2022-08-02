@@ -94,6 +94,10 @@ class EOF(Exception):
 
     pass
 
+def version():
+    '''Returns the version of the libarchive library.'''
+    return _libarchive.ARCHIVE_VERSION_STRING.split()[1]
+    
 
 def get_error(archive):
     '''Retrieves the last error description for the given archive instance.'''
