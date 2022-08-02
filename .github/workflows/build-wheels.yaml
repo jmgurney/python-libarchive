@@ -70,7 +70,7 @@ jobs:
       run: |
         export LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH
         export LIBARCHIVE_PREFIX=/usr/local
-        echo "::set-output name=version::$(cd /tmp; python3 -c 'import libarchive;  print(libarchive.version()')"
+        echo "::set-output name=version::$(cd /tmp; python3 -c 'import libarchive;  print(libarchive.version())')"
       id: version
 
     - uses: actions/upload-artifact@v3
