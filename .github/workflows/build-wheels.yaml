@@ -53,23 +53,19 @@ jobs:
       run: |
         rm -rf build wheelhouse
         touch libarchive/_libarchive.i
-        export LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH
-        export LIBARCHIVE_PREFIX=/usr/local
+        echo LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH >>$GITHUB_ENV
+        echo LIBARCHIVE_PREFIX=/usr/local >>$GITHUB_ENV
         python3 setup.py install
 
 
     - name: Build wheels
       run: |
-        export LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH
-        export LIBARCHIVE_PREFIX=/usr/local
         python3 -m pip wheel --wheel-dir dist/ .
         auditwheel repair dist/*.whl
         python3 -m pip install --force-reinstall wheelhouse/*.whl
 
     - name: version
       run: |
-        export LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH
-        export LIBARCHIVE_PREFIX=/usr/local
         echo "::set-output name=version::$(cd /tmp; python3 -c 'import libarchive;  print(libarchive.version())')"
       id: version
 
@@ -86,7 +82,7 @@ jobs:
         draft: false
         prerelease: false
         release_name: Release ${{ steps.version.outputs.version }}
-        tag_name: V${{ steps.version.outputs.version }}-p1
+        tag_name: V${{ steps.version.outputs.version }}-${{ github.ref_name }}-${{ github.run_number }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
