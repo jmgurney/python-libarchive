@@ -31,7 +31,7 @@ jobs:
     - name: Install dependencies
       run: |
         yum install -y epel-release libxml2-devel libzstd-devel xz-devel bzip2-devel
-        yum install -y libacl-devel openssl-devel
+        yum install -y libacl-devel lz4-devel e2fsprogs-devel libb2-devel lzo-devel openssl-devel
         yum install -y librichacl-devel swig strace
 
     - name: Install python tools
@@ -86,7 +86,7 @@ jobs:
         draft: false
         prerelease: false
         release_name: Release ${{ steps.version.outputs.version }}
-        tag_name: V${{ steps.version.outputs.version }}
+        tag_name: V${{ steps.version.outputs.version }}-p1
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
