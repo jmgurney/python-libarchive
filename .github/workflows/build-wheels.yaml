@@ -49,12 +49,15 @@ jobs:
         cd ../..
 
 
-    - name: Compile pyhton modules
+    - name: Prepare build environment
       run: |
         rm -rf build wheelhouse
         touch libarchive/_libarchive.i
         echo LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH >>$GITHUB_ENV
         echo LIBARCHIVE_PREFIX=/usr/local >>$GITHUB_ENV
+
+    - name: Compile pyhton modules
+      run: |
         python3 setup.py install
 
 
