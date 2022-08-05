@@ -45,7 +45,7 @@ jobs:
     - name: Build libarchive C sources
       run: |
         git clone https://github.com/libarchive/libarchive.git libarchive-src    
-        cd libarchive-src; git checkout {{ env.libarchive_tag }}
+        cd libarchive-src; git checkout ${{ env.libarchive_tag }}
         mkdir build-libarchive; cd build-libarchive
         cmake ../
         make -j$(nproc);  make install
