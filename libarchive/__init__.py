@@ -353,10 +353,8 @@ class Entry(object):
             )
 
             if entry.issym():
-                print("issym")
                 symLinkPath = _libarchive.archive_entry_symlink(e)
                 entry.symlink = symLinkPath
-                print(symLinkPath)
 
         finally:
             _libarchive.archive_entry_free(e)
