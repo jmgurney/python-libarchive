@@ -287,9 +287,9 @@ class EntryWriteStream(object):
             if PY3:
                 self.buffer.write(data)
             else:
-                self.buffer.write(data.encode('utf-8'))
+                self.buffer.write(unicode(data, ENCODING))
         else:
-            _libarchive.archive_write_data_from_str(self.archive._a, data.encode('utf-8'))
+            _libarchive.archive_write_data_from_str(self.archive._a, data.encode(ENCODING))
         self.bytes += len(data)
 
     def close(self):
@@ -298,7 +298,7 @@ class EntryWriteStream(object):
         if self.buffer:
             self.entry.size = self.buffer.tell()
             self.entry.to_archive(self.archive)
-            _libarchive.archive_write_data_from_str(self.archive._a, self.buffer.getvalue().encode('utf-8'))
+            _libarchive.archive_write_data_from_str(self.archive._a, self.buffer.getvalue().encode(ENCODING))
         _libarchive.archive_write_finish_entry(self.archive._a)
 
         # Call archive.close() with _defer True to let it know we have been
@@ -615,7 +615,7 @@ class Archive(object):
                 if isinstance(data, bytes):
                     result = _libarchive.archive_write_data_from_str(self._a, data)
                 else:
-                    result = _libarchive.archive_write_data_from_str(self._a, data.encode('utf8'))
+                    result = _libarchive.archive_write_data_from_str(self._a, data.encode(self.encoding))
             else:
                 result = _libarchive.archive_write_data_from_str(self._a, data)
         _libarchive.archive_write_finish_entry(self._a)
