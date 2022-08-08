@@ -34,8 +34,7 @@ import warnings
 from libarchive import _libarchive
 from io import StringIO
 
-# PY3 = sys.version_info[0] == 3
-PY3 = True
+PY3 = sys.version_info[0] >= 3
 
 # Suggested block size for libarchive. Libarchive may adjust it.
 BLOCK_SIZE = 10240
