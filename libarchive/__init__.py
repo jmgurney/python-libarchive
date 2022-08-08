@@ -285,7 +285,10 @@ class EntryWriteStream(object):
         if self.closed:
             raise Exception('Cannot write to closed stream.')
         if self.buffer:
-            self.buffer.write(data)
+            if PY3:
+                self.buffer.write(data)
+            else:
+                self.buffer.write(data.encode('utf-8'))
         else:
             _libarchive.archive_write_data_from_str(self.archive._a, data.encode('utf-8'))
         self.bytes += len(data)
