@@ -100,7 +100,6 @@ class ZipFile(SeekableArchive):
         if not names:
             names = self.namelist()
         if names:
-            print(f"Extracting {names} files.")
             for name in names:
                 self.extract(name, path)
 
