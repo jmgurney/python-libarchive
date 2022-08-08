@@ -1,0 +1,28 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    strategy:
+      matrix:
+        version: [2.7, 3.8]
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install host dependencies
+      run: sudo apt update && sudo apt install -y libarchive-dev python${{ matrix.version }}-dev
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.version }}
+
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Build the library
+      env:
+        PYVER: ${{ matrix.version }}
+      run: make build
+
+    - name: Run tests
+      run: make test
