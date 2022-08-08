@@ -163,7 +163,7 @@ def is_archive(f, formats=(None,), filters=(None,)):
 
     This function will return True if the file can be opened as an archive using the given
     format(s)/filter(s).'''
-    need_close: bool = False
+    need_close = False
     if isinstance(f, str):
         f = open(f, 'rb')
         need_close = True
