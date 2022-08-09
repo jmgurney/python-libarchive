@@ -11,8 +11,6 @@ verify:
 install:
 	python setup.py install
 
-wheel:
-	pip wheel --wheel-dir dist/ .
 
 publish:
 	python setup.py register
