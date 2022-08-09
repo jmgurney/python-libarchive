@@ -269,10 +269,11 @@ ITEM_NAME='test.txt'
 
 class TestPasswordProtection(unittest.TestCase):
     def setUp(self):
-        with open(ZIPPATH, mode='w') as f:
-            if PY3:
-                f.write(base64.b64decode(ZIP_CONTENT).decode('latin1'))
-            else:
+        if PY3:
+            with open(ZIPPATH, mode='wb') as f:
+                f.write(base64.b64decode(ZIP_CONTENT))
+        else:
+            with open(ZIPPATH, mode='w') as f:
                 f.write(base64.b64decode(ZIP_CONTENT))
 
     
