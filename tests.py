@@ -271,7 +271,7 @@ class TestPasswordProtection(unittest.TestCase):
     def setUp(self):
         with open(ZIPPATH, mode='w') as f:
             if PY3:
-                f.write(base64.b64decode(ZIP_CONTENT).decode('utf-8'))
+                f.write(base64.b64decode(ZIP_CONTENT).decode('latin1'))
             else:
                 f.write(base64.b64decode(ZIP_CONTENT))
 
