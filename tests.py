@@ -33,8 +33,7 @@ import io
 from libarchive import Archive, is_archive_name, is_archive
 from libarchive.zip import is_zipfile, ZipFile, ZipEntry
 
-# PY3 = sys.version_info[0] == 3
-PY3 = True
+PY3 = sys.version_info[0] == 3
 
 TMPDIR = tempfile.mkdtemp(suffix='.python-libarchive')
 ZIPFILE = 'test.zip'
@@ -250,6 +249,15 @@ class TestZipWrite(unittest.TestCase):
 
 import base64
 
+# ZIP_CONTENT is base64 encoded password protected zip file with password: 'pwd' and following contents:
+# unzip -l /tmp/zzz.zip 
+#Archive:  /tmp/zzz.zip
+#  Length      Date    Time    Name
+#---------  ---------- -----   ----
+#        9  08-09-2022 19:29   test.txt
+#---------                     -------
+#        9                     1 file
+
 ZIP_CONTENT='UEsDBAoACQAAAKubCVVjZ7b1FQAAAAkAAAAIABwAdGVzdC50eHRVVAkAA5K18mKStfJid' + \
         'XgLAAEEAAAAAAQAAAAA5ryoP1rrRK5apjO41YMAPjpkWdU3UEsHCGNntvUVAAAACQAAAF' + \
         'BLAQIeAwoACQAAAKubCVVjZ7b1FQAAAAkAAAAIABgAAAAAAAEAAACkgQAAAAB0ZXN0LnR' + \
@@ -262,7 +270,11 @@ ITEM_NAME='test.txt'
 class TestPasswordProtection(unittest.TestCase):
     def setUp(self):
         with open(ZIPPATH, mode='w') as f:
-            f.write(base64.b64decode(ZIP_CONTENT))
+            if PY3:
+                f.write(base64.b64decode(ZIP_CONTENT).decode('utf-8'))
+            else:
+                f.write(base64.b64decode(ZIP_CONTENT))
+
     
     def tearDown(self):
         os.remove(ZIPPATH)
