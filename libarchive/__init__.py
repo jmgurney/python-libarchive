@@ -28,9 +28,6 @@ import stat
 import sys
 import time
 import warnings
-
-# from ctypes import cdll, c_char_p
-
 from libarchive import _libarchive
 from io import StringIO
 
@@ -323,11 +320,6 @@ class Entry(object):
 
         self.symlink = ""
 
-        # if self.issym() and symlink:
-        #    self.symlink = symlink
-        # else:
-        #    self.symlink = None
-
     @property
     def header_position(self):
         return self.hpos
@@ -387,9 +379,7 @@ class Entry(object):
                 entry.mtime = getattr(f, 'mtime', time.time())
                 entry.mode = stat.S_IFREG
 
-            if stat.S_ISLNK(entry.mode):
-                print("yo")
-
+ 
         return entry
 
     def to_archive(self, archive):
@@ -410,8 +400,6 @@ class Entry(object):
 
             call_and_check(_libarchive.archive_write_header, archive._a, archive._a, e)
 
-            # todo
-            # self.hpos = archive.header_position
         finally:
             _libarchive.archive_entry_free(e)
 
