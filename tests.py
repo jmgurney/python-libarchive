@@ -176,31 +176,6 @@ class TestZipWrite(unittest.TestCase):
                 z.writepath(f)
         z.close()
 
-    def test_writepath_with_password(self):
-        z = ZipFile(self.f, 'w', password='test')
-        for fname in FILENAMES:
-            with open(os.path.join(TMPDIR, fname), 'r') as f:
-                z.writepath(f)
-        z.close()
-        self.f.close()
-
-
-        nz = ZipFile(ZIPPATH, 'r', password='test')
-        for fname in FILENAMES:
-            ffname = os.path.join(TMPDIR, fname)
-            with open(ffname, 'r') as f:
-                self.assertEqual(f.read(), nz.read(ffname))
-
-        nz.close()
-
-        nz = ZipFile(ZIPPATH, 'r')
-        with self.assertRaises(Exception) as ctx:
-            ffname = os.path.join(TMPDIR, FILENAMES[0])
-            with open(ffname, 'r') as f:
-                self.assertEqual(f.read(), nz.read(ffname))
-        nz.close()
-
-
 
     def test_writepath_directory(self):
         """Test writing a directory."""
@@ -270,6 +245,41 @@ class TestZipWrite(unittest.TestCase):
         o.close()
         self.assertIsNone(z._a)
         self.assertIsNone(z._stream)
+        z.close()
+
+
+import base64
+
+ZIP_CONTENT='UEsDBAoACQAAAKubCVVjZ7b1FQAAAAkAAAAIABwAdGVzdC50eHRVVAkAA5K18mKStfJid' + \
+        'XgLAAEEAAAAAAQAAAAA5ryoP1rrRK5apjO41YMAPjpkWdU3UEsHCGNntvUVAAAACQAAAF' + \
+        'BLAQIeAwoACQAAAKubCVVjZ7b1FQAAAAkAAAAIABgAAAAAAAEAAACkgQAAAAB0ZXN0LnR' + \
+        '4dFVUBQADkrXyYnV4CwABBAAAAAAEAAAAAFBLBQYAAAAAAQABAE4AAABnAAAAAAA='
+
+ITEM_CONTENT='test.txt\n'
+ITEM_NAME='test.txt'
+
+
+class TestPasswordProtection(unittest.TestCase):
+    def setUp(self):
+        with open(ZIPPATH, mode='w') as f:
+            f.write(base64.b64decode(ZIP_CONTENT))
+    
+    def tearDown(self):
+        os.remove(ZIPPATH)
+
+    def test_read_with_password(self):
+        z = ZipFile(ZIPPATH, 'r', password='pwd')
+        self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        z.close()
+
+    def test_read_without_password(self):
+        z = ZipFile(ZIPPATH, 'r')
+        self.assertRaises(RuntimeError, z.read, ITEM_NAME)
+        z.close()
+
+    def test_read_with_wrong_password(self):
+        z = ZipFile(ZIPPATH, 'r', password='wrong')
+        self.assertRaises(RuntimeError, z.read, ITEM_NAME)
         z.close()
 
 
