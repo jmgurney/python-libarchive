@@ -282,7 +282,10 @@ class TestPasswordProtection(unittest.TestCase):
 
     def test_read_with_password(self):
         z = ZipFile(ZIPPATH, 'r', password='pwd')
-        self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        if PY3:
+            self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
+        else:
+            self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
         z.close()
 
     def test_read_without_password(self):

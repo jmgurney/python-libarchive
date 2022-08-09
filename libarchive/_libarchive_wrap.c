@@ -3193,7 +3193,7 @@ SWIG_AsVal_unsigned_SS_short (PyObject * obj, unsigned short *val)
 }
 
 
-
+#if 1
 PyObject *archive_read_data_into_str(struct archive *archive, int len) {
     PyObject *str = NULL;
     if (!(str = PyBytes_FromStringAndSize(NULL, len))) {
@@ -3216,6 +3216,29 @@ PyObject *archive_write_data_from_str(struct archive *archive, PyObject *str) {
     }
     return PyInt_FromLong(len);
 }
+#else
+PyObject *archive_read_data_into_str(struct archive *archive, int len) {
+    PyObject *str = NULL;
+    if (!(str = PyUnicode_FromStringAndSize(NULL, len))) {
+        PyErr_SetString(PyExc_MemoryError, "could not allocate string.");
+        return NULL;
+    }
+    if (len != archive_read_data(archive, PyString_AS_STRING(str), len)) {
+        PyErr_SetString(PyExc_RuntimeError, "could not read requested data.");
+        return NULL;
+    }
+    return str;
+}
+
+PyObject *archive_write_data_from_str(struct archive *archive, PyObject *str) {
+    int len = PyString_Size(str);
+    if (!archive_write_data(archive, PyString_AS_STRING(str), len)) {
+        PyErr_SetString(PyExc_RuntimeError, "could not write requested data.");
+        return NULL;
+    }
+    return PyInt_FromLong(len);
+}
+#endif
 
 #ifdef __cplusplus
 extern "C" {
