@@ -283,7 +283,7 @@ class EntryWriteStream(object):
         if self.buffer:
             if PY3:
                 self.buffer.write(data)
-            else:
+            elif isinstance(data, str):
                 self.buffer.write(unicode(data, ENCODING))
         else:
             _libarchive.archive_write_data_from_str(self.archive._a, data.encode(ENCODING))
