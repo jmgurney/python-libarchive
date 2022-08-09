@@ -34,33 +34,27 @@ except ImportError:
     from distutils.core import setup, Extension
     from distutils.command.build_ext import build_ext
 
-import subprocess
 
 
 # Use a provided libarchive else default to hard-coded path.
 libarchivePrefix = environ.get('LIBARCHIVE_PREFIX')
 
-includePath = f"{libarchivePrefix or '/usr'}/include"
-# retreive the version number form SWIG generated file
-print("includePath:", (libarchivePrefix, includePath))
+if libarchivePrefix:
+    includePath = libarchivePrefix + '/include'
+else:
+    includePath = '/usr/local/include'
 
-cmd = [
-    'awk',
-    '/#define.*ARCHIVE_VERSION_NUMBER/ { if (match($0,"[[:digit:]]+")) print substr($0, RSTART,RLENGTH) }',
-    f"{includePath}/archive.h"
-]
 
-p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-print("awk output:", p.stdout.decode('utf-8'))
-vnum = int(p.stdout)
 
-name = 'python-libarchive-ext'
-version = '{}.{}.{}'.format(vnum // 1000000, (vnum // 1000) % 100, vnum % 100)
-versrel = version
+
+name = 'python-libarchive'
+version = '4.0.1'
+release = '2'
+versrel = version + '-' + release
 readme = 'README.rst'
-repourl = 'https://github.com/Vadiml1024/python-libarchive'
-repobranch = 'extended'
-download_url = repourl + f'/tarball/{repobranch}'
+download_url = "http://" + name + ".googlecode.com/files/" + name + "-" + \
+                                                          versrel + ".tar.gz"
+repourl = 'https://github.com/smartfile/python-libarchive'
 long_description = open(readme).read()
 
 
@@ -101,7 +95,7 @@ __libarchive = Extension(
     libraries=['archive'],
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
-    include_dirs=['libarchive'],
+    include_dirs=[includePath, 'libarchive'],
 )
 
 
