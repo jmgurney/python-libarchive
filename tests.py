@@ -182,6 +182,25 @@ class TestZipWrite(unittest.TestCase):
             with open(os.path.join(TMPDIR, fname), 'r') as f:
                 z.writepath(f)
         z.close()
+        self.f.close()
+
+
+        nz = ZipFile(ZIPPATH, 'r', password='test')
+        for fname in FILENAMES:
+            ffname = os.path.join(TMPDIR, fname)
+            with open(ffname, 'r') as f:
+                self.assertEqual(f.read(), nz.read(ffname))
+
+        nz.close()
+
+        nz = ZipFile(ZIPPATH, 'r')
+        with self.assertRaises(Exception) as ctx:
+            ffname = os.path.join(TMPDIR, FILENAMES[0])
+            with open(ffname, 'r') as f:
+                self.assertEqual(f.read(), nz.read(ffname))
+        nz.close()
+
+
 
     def test_writepath_directory(self):
         """Test writing a directory."""

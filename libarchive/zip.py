@@ -106,7 +106,7 @@ class ZipFile(SeekableArchive):
     def read(self, name, pwd=None):
         if pwd:
             self.add_passphrase(pwd)
-        return self.read(name)
+        return super(ZipFile, self).read(name)
 
     def writestr(self, member, data, compress_type=None):
         if compress_type != self.compression:
