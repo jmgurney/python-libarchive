@@ -266,22 +266,33 @@ ZIP_CONTENT='UEsDBAoACQAAAKubCVVjZ7b1FQAAAAkAAAAIABwAdGVzdC50eHRVVAkAA5K18mKStfJ
 ITEM_CONTENT='test.txt\n'
 ITEM_NAME='test.txt'
 
+ZIP1_PWD='pwd'
+ZIP2_PWD='12345'
+def create_file_from_content():
+    if PY3:
+        with open(ZIPPATH, mode='wb') as f:
+            f.write(base64.b64decode(ZIP_CONTENT))
+    else:
+        with open(ZIPPATH, mode='w') as f:
+            f.write(base64.b64decode(ZIP_CONTENT))
 
-class TestPasswordProtection(unittest.TestCase):
+
+def create_protected_zip():
+    z = ZipFile(ZIPPATH, mode='w', password=ZIP2_PWD)
+    z.writestr(ITEM_NAME, ITEM_CONTENT)
+    z.close()
+
+
+class TestProtectedReading(unittest.TestCase):
     def setUp(self):
-        if PY3:
-            with open(ZIPPATH, mode='wb') as f:
-                f.write(base64.b64decode(ZIP_CONTENT))
-        else:
-            with open(ZIPPATH, mode='w') as f:
-                f.write(base64.b64decode(ZIP_CONTENT))
+        create_file_from_content()
 
-    
+
     def tearDown(self):
         os.remove(ZIPPATH)
 
     def test_read_with_password(self):
-        z = ZipFile(ZIPPATH, 'r', password='pwd')
+        z = ZipFile(ZIPPATH, 'r', password=ZIP1_PWD)
         if PY3:
             self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
         else:
@@ -297,6 +308,40 @@ class TestPasswordProtection(unittest.TestCase):
         z = ZipFile(ZIPPATH, 'r', password='wrong')
         self.assertRaises(RuntimeError, z.read, ITEM_NAME)
         z.close()
+
+class TestProtectedWriting(unittest.TestCase):
+    def setUp(self):
+        create_protected_zip()
+
+    def tearDown(self):
+        os.remove(ZIPPATH)
+
+    def test_read_with_password(self):
+        z = ZipFile(ZIPPATH, 'r', password=ZIP2_PWD)
+        if PY3:
+            self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
+        else:
+            self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        z.close()
+
+    def test_read_without_password(self):
+        z = ZipFile(ZIPPATH, 'r')
+        self.assertRaises(RuntimeError, z.read, ITEM_NAME)
+        z.close()
+
+    def test_read_with_wrong_password(self):
+        z = ZipFile(ZIPPATH, 'r', password='wrong')
+        self.assertRaises(RuntimeError, z.read, ITEM_NAME)
+        z.close()
+
+    def test_read_with_password_list(self):
+        z = ZipFile(ZIPPATH, 'r', password=[ZIP1_PWD, ZIP2_PWD])
+        if PY3:
+            self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
+        else:
+            self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        z.close()
+
 
 
 class TestHighLevelAPI(unittest.TestCase):
