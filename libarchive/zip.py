@@ -1,10 +1,10 @@
 import os, time
-from libarchive import is_archive, Entry, SeekableArchive
+from libarchive import is_archive, Entry, SeekableArchive, _libarchive
 from zipfile import ZIP_STORED, ZIP_DEFLATED
 
 
 def is_zipfile(filename):
-    return is_archive(filename, formats=('zip',))
+    return is_archive(filename, formats=("zip",))
 
 
 class ZipEntry(Entry):
@@ -23,7 +23,7 @@ class ZipEntry(Entry):
         return self.size
 
     def set_file_size(self, value):
-        assert isinstance(value, int), 'Please provide size as int or long.'
+        assert isinstance(value, int), "Please provide size as int or long."
         self.size = value
 
     file_size = property(get_file_size, set_file_size)
@@ -32,8 +32,12 @@ class ZipEntry(Entry):
         return time.localtime(self.mtime)[0:6]
 
     def set_date_time(self, value):
-        assert isinstance(value, tuple), 'mtime should be tuple (year, month, day, hour, minute, second).'
-        assert len(value) == 6, 'mtime should be tuple (year, month, day, hour, minute, second).'
+        assert isinstance(
+            value, tuple
+        ), "mtime should be tuple (year, month, day, hour, minute, second)."
+        assert (
+            len(value) == 6
+        ), "mtime should be tuple (year, month, day, hour, minute, second)."
         self.mtime = time.mktime(value + (0, 0, 0))
 
     date_time = property(get_date_time, set_date_time)
@@ -61,17 +65,45 @@ class ZipEntry(Entry):
     compress_size = property(_get_missing, _set_missing)
 
 
+# encryption is one of (traditional = zipcrypt, aes128, aes256)
 class ZipFile(SeekableArchive):
-    def __init__(self, f, mode='r', compression=ZIP_DEFLATED, allowZip64=False, password=None):
-        super(ZipFile, self).__init__(
-            f, mode=mode, format='zip', entry_class=ZipEntry, encoding='CP437', password=password
-        )
-        if mode == 'w' and compression == ZIP_STORED:
-            # Disable compression for writing.
-            _libarchive.archive_write_set_format_option(self.archive._a, "zip", "compression", "store")
+    def __init__(
+        self,
+        f,
+        mode="r",
+        compression=ZIP_DEFLATED,
+        allowZip64=False,
+        password=None,
+        encryption=None,
+    ):
+
+        self.encryption = encryption
         self.compression = compression
 
+        super(ZipFile, self).__init__(
+            f,
+            mode=mode,
+            format="zip",
+            entry_class=ZipEntry,
+            encoding="CP437",
+            password=password,
+        )
+
     getinfo = SeekableArchive.getentry
+
+    def set_initial_options(self):
+        if self.mode == "w" and self.compression == ZIP_STORED:
+            # Disable compression for writing.
+            _libarchive.archive_write_set_format_option(
+                self._a, "zip", "compression", "store"
+            )
+
+        if self.mode == "w" and self.password:
+            if not self.encryption:
+                self.encryption = "traditional"
+            _libarchive.archive_write_set_format_option(
+                self._a, "zip", "encryption", self.encryption
+            )
 
     def namelist(self):
         return list(self.iterpaths())
@@ -80,7 +112,7 @@ class ZipFile(SeekableArchive):
         return list(self)
 
     def open(self, name, mode, pwd=None):
-        if mode == 'r':
+        if mode == "r":
             if pwd:
                 self.add_passphrase(pwd)
             return self.readstream(name)
@@ -109,8 +141,8 @@ class ZipFile(SeekableArchive):
         return super(ZipFile, self).read(name)
 
     def writestr(self, member, data, compress_type=None):
-        if compress_type != self.compression:
-            raise Exception('Cannot change compression type for individual entries.')
+        if compress_type != self.compression and not (compress_type is None):
+            raise Exception("Cannot change compression type for individual entries.")
         return self.write(member, data)
 
     def setpassword(self, pwd):
