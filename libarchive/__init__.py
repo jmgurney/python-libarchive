@@ -499,7 +499,7 @@ class Archive(object):
     def __del__(self):
         self.close()
 
-    def set_initila_options(self):
+    def set_initial_options(self):
         pass
 
     def init(self):
@@ -509,10 +509,14 @@ class Archive(object):
             self._a = _libarchive.archive_write_new()
         self.format_func(self._a)
         self.filter_func(self._a)
-        self.set_initila_options()
+        self.set_initial_options()
         if self.mode == 'r':
             if self.password:
-                self.add_passphrase(self.password)
+                if isinstance(self.password, list):
+                    for pwd in self.password:
+                        self.add_passphrase(pwd)
+                else:
+                    self.add_passphrase(self.password)
             call_and_check(_libarchive.archive_read_open_fd, self._a, self._a, self.f.fileno(), self.blocksize)
         else:
             if self.password:
@@ -594,7 +598,8 @@ class Archive(object):
     def write(self, member, data=None):
         '''Writes a string buffer to the archive as the given entry.'''
         if isinstance(member, str):
-            member = self.entry_class(pathname=member, encoding=self.encoding)
+            member = self.entry_class(pathname=member, encoding=self.encoding,
+                mtime=time.time(), mode=stat.S_IFREG)
         if data:
             member.size = len(data)
         member.to_archive(self)
