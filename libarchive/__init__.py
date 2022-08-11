@@ -499,6 +499,9 @@ class Archive(object):
     def __del__(self):
         self.close()
 
+    def set_initila_options(self):
+        pass
+
     def init(self):
         if self.mode == 'r':
             self._a = _libarchive.archive_read_new()
@@ -506,6 +509,7 @@ class Archive(object):
             self._a = _libarchive.archive_write_new()
         self.format_func(self._a)
         self.filter_func(self._a)
+        self.set_initila_options()
         if self.mode == 'r':
             if self.password:
                 self.add_passphrase(self.password)

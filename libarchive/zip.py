@@ -1,5 +1,5 @@
 import os, time
-from libarchive import is_archive, Entry, SeekableArchive
+from libarchive import is_archive, Entry, SeekableArchive, _libarchive
 from zipfile import ZIP_STORED, ZIP_DEFLATED
 
 
@@ -60,18 +60,33 @@ class ZipEntry(Entry):
     CRC = property(_get_missing, _set_missing)
     compress_size = property(_get_missing, _set_missing)
 
-
+# encryption is one of (traditional = zipcrypt, aes128, aes256)
 class ZipFile(SeekableArchive):
-    def __init__(self, f, mode='r', compression=ZIP_DEFLATED, allowZip64=False, password=None):
+    def __init__(self, f, mode='r', compression=ZIP_DEFLATED, allowZip64=False, password=None,
+        encryption=None):
         super(ZipFile, self).__init__(
             f, mode=mode, format='zip', entry_class=ZipEntry, encoding='CP437', password=password
         )
+        self.compression = compression
+        self.encryption = encryption
         if mode == 'w' and compression == ZIP_STORED:
             # Disable compression for writing.
             _libarchive.archive_write_set_format_option(self.archive._a, "zip", "compression", "store")
-        self.compression = compression
+        
 
     getinfo = SeekableArchive.getentry
+
+    def set_initial_options(self):
+        if self.mode == 'w' and self.compression == ZIP_STORED:
+            # Disable compression for writing.
+            _libarchive.archive_write_set_format_option(self.archive._a, "zip", "compression", "store")
+        
+        if self.mode == 'w' and self.password:
+            if not self.encryption:
+                self.encryption = "traditional"
+            _libarchive.archive_write_set_format_option(self._a, "zip", "encryption", self.encryption)
+          
+       
 
     def namelist(self):
         return list(self.iterpaths())
