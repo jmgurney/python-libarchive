@@ -49,7 +49,7 @@ else:
 
 name = 'python-libarchive'
 version = '4.0.1'
-release = '2'
+release = '1'
 versrel = version + '-' + release
 readme = 'README.rst'
 download_url = "http://" + name + ".googlecode.com/files/" + name + "-" + \
