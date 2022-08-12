@@ -35,6 +35,18 @@ except ImportError:
     from distutils.command.build_ext import build_ext
 
 
+
+# Use a provided libarchive else default to hard-coded path.
+libarchivePrefix = environ.get('LIBARCHIVE_PREFIX')
+
+if libarchivePrefix:
+    includePath = libarchivePrefix + '/include'
+else:
+    includePath = '/usr/local/include'
+
+
+
+
 name = 'python-libarchive'
 version = '4.0.1'
 release = '1'
@@ -42,22 +54,19 @@ versrel = version + '-' + release
 readme = 'README.rst'
 download_url = "http://" + name + ".googlecode.com/files/" + name + "-" + \
                                                           versrel + ".tar.gz"
+repourl = 'https://github.com/smartfile/python-libarchive'
 long_description = open(readme).read()
+
 
 class build_ext_extra(build_ext, object):
     """
     Extend build_ext allowing extra_compile_args and extra_link_args to be set
     on the command-line.
     """
+
     user_options = build_ext.user_options
-    user_options.append(
-        ('extra-compile-args=', None,
-         'Extra arguments passed directly to the compiler')
-        )
-    user_options.append(
-        ('extra-link-args=', None,
-         'Extra arguments passed directly to the linker')
-        )
+    user_options.append(('extra-compile-args=', None, 'Extra arguments passed directly to the compiler'))
+    user_options.append(('extra-link-args=', None, 'Extra arguments passed directly to the linker'))
 
     def initialize_options(self):
         build_ext.initialize_options(self)
@@ -72,48 +81,47 @@ class build_ext_extra(build_ext, object):
         super(build_ext_extra, self).build_extension(ext)
 
 
-# Use a provided libarchive else default to hard-coded path.
-libarchivePrefix = environ.get('LIBARCHIVE_PREFIX')
 if libarchivePrefix:
     extra_compile_args = ['-I{0}/include'.format(libarchivePrefix)]
     extra_link_args = ['-Wl,-rpath={0}/lib'.format(libarchivePrefix)]
-    environ['LDFLAGS'] = '-L{0}/lib {1}'.format(libarchivePrefix,
-                                                environ.get('LDFLAGS', ''))
+    environ['LDFLAGS'] = '-L{0}/lib {1}'.format(libarchivePrefix, environ.get('LDFLAGS', ''))
 else:
     extra_compile_args = []
-    extra_link_args = ['-l:libarchive.so.13']
+    extra_link_args = ['-l:libarchive.so.18']
 
-__libarchive = Extension(name='libarchive.__libarchive',
-                        sources=['libarchive/_libarchive_wrap.c'],
-                        libraries=['archive'],
-                        extra_compile_args=extra_compile_args,
-                        extra_link_args=extra_link_args,
-                        include_dirs=['libarchive'],
-                        )
+__libarchive = Extension(
+    name='libarchive.__libarchive',
+    sources=['libarchive/_libarchive.i'],
+    libraries=['archive'],
+    extra_compile_args=extra_compile_args,
+    extra_link_args=extra_link_args,
+    include_dirs=[includePath, 'libarchive'],
+)
 
 
-setup(name = name,
-      version = versrel,
-      description = 'A libarchive wrapper for Python.',
-      long_description = long_description,
-      license = 'BSD-style license',
-      platforms = ['any'],
-      author = 'Ben Timby, Travis Cunningham, Ryan Johnston, SmartFile',
-      author_email = 'tcunningham@smartfile.com',
-      url = 'https://github.com/smartfile/python-libarchive',
-      download_url = download_url,
-      packages = ['libarchive'],
-      classifiers = [
-          'Development Status :: 4 - Beta',
-          'Intended Audience :: Developers',
-          'Operating System :: OS Independent',
-          'Programming Language :: C',
-          'Programming Language :: Python',
-          'Topic :: System :: Archiving :: Compression',
-          'Topic :: Software Development :: Libraries :: Python Modules',
-      ],
-      cmdclass = {
+setup(
+    name=name,
+    version=versrel,
+    description='A libarchive wrapper for Python supporting password protection.',
+    long_description=long_description,
+    license='BSD-style license',
+    platforms=['any'],
+    author='Vadim Lebedev, Ben Timby, Travis Cunningham, Ryan Johnston, SmartFile',
+    author_email='vadiml1024@gmail.com',
+    url=repourl,
+    download_url=download_url,
+    packages=['libarchive'],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Operating System :: OS Independent',
+        'Programming Language :: C',
+        'Programming Language :: Python',
+        'Topic :: System :: Archiving :: Compression',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
+    cmdclass={
         'build_ext': build_ext_extra,
-      },
-      ext_modules = [__libarchive],
-      )
+    },
+    ext_modules=[__libarchive],
+)

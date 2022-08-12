@@ -80,8 +80,8 @@ class TestIsArchiveZip(unittest.TestCase):
 
     def test_zip(self):
         self.assertEqual(is_archive(ZIPPATH), True)
-        self.assertEqual(is_archive(ZIPPATH, formats=('zip', )), True)
-        self.assertEqual(is_archive(ZIPPATH, formats=('tar', )), False)
+        self.assertEqual(is_archive(ZIPPATH, formats=('zip',)), True)
+        self.assertEqual(is_archive(ZIPPATH, formats=('tar',)), False)
 
 
 class TestIsArchiveTar(unittest.TestCase):
@@ -111,7 +111,7 @@ class TestZipRead(unittest.TestCase):
         self.assertEqual(count, len(FILENAMES), 'Did not enumerate correct number of items in archive.')
 
     def test_deferred_close_by_archive(self):
-        """ Test archive deferred close without a stream. """
+        """Test archive deferred close without a stream."""
         z = ZipFile(self.f, 'r')
         self.assertIsNotNone(z._a)
         self.assertIsNone(z._stream)
@@ -119,7 +119,7 @@ class TestZipRead(unittest.TestCase):
         self.assertIsNone(z._a)
 
     def test_deferred_close_by_stream(self):
-        """ Ensure archive closes self if stream is closed first. """
+        """Ensure archive closes self if stream is closed first."""
         z = ZipFile(self.f, 'r')
         stream = z.readstream(FILENAMES[0])
         stream.close()
@@ -131,8 +131,8 @@ class TestZipRead(unittest.TestCase):
         self.assertTrue(stream.closed)
 
     def test_close_stream_first(self):
-        """ Ensure that archive stays open after being closed if a stream is
-        open. Further, ensure closing the stream closes the archive. """
+        """Ensure that archive stays open after being closed if a stream is
+        open. Further, ensure closing the stream closes the archive."""
         z = ZipFile(self.f, 'r')
         stream = z.readstream(FILENAMES[0])
         z.close()
@@ -153,8 +153,8 @@ class TestZipRead(unittest.TestCase):
             names.append(e.filename)
         self.assertEqual(names, FILENAMES, 'File names differ in archive.')
 
-    #~ def test_non_ascii(self):
-        #~ pass
+    # ~ def test_non_ascii(self):
+    # ~ pass
 
     def test_extract_str(self):
         pass
@@ -175,8 +175,9 @@ class TestZipWrite(unittest.TestCase):
                 z.writepath(f)
         z.close()
 
+
     def test_writepath_directory(self):
-        """ Test writing a directory. """
+        """Test writing a directory."""
         z = ZipFile(self.f, 'w')
         z.writepath(None, pathname='/testdir', folder=True)
         z.writepath(None, pathname='/testdir/testinside', folder=True)
@@ -230,7 +231,7 @@ class TestZipWrite(unittest.TestCase):
         z.close()
 
     def test_deferred_close_by_archive(self):
-        """ Test archive deferred close without a stream. """
+        """Test archive deferred close without a stream."""
         z = ZipFile(self.f, 'w')
         o = z.writestream(FILENAMES[0])
         z.close()
@@ -246,12 +247,109 @@ class TestZipWrite(unittest.TestCase):
         z.close()
 
 
+import base64
+
+# ZIP_CONTENT is base64 encoded password protected zip file with password: 'pwd' and following contents:
+# unzip -l /tmp/zzz.zip 
+#Archive:  /tmp/zzz.zip
+#  Length      Date    Time    Name
+#---------  ---------- -----   ----
+#        9  08-09-2022 19:29   test.txt
+#---------                     -------
+#        9                     1 file
+
+ZIP_CONTENT='UEsDBAoACQAAAKubCVVjZ7b1FQAAAAkAAAAIABwAdGVzdC50eHRVVAkAA5K18mKStfJid' + \
+        'XgLAAEEAAAAAAQAAAAA5ryoP1rrRK5apjO41YMAPjpkWdU3UEsHCGNntvUVAAAACQAAAF' + \
+        'BLAQIeAwoACQAAAKubCVVjZ7b1FQAAAAkAAAAIABgAAAAAAAEAAACkgQAAAAB0ZXN0LnR' + \
+        '4dFVUBQADkrXyYnV4CwABBAAAAAAEAAAAAFBLBQYAAAAAAQABAE4AAABnAAAAAAA='
+
+ITEM_CONTENT='test.txt\n'
+ITEM_NAME='test.txt'
+
+ZIP1_PWD='pwd'
+ZIP2_PWD='12345'
+def create_file_from_content():
+    if PY3:
+        with open(ZIPPATH, mode='wb') as f:
+            f.write(base64.b64decode(ZIP_CONTENT))
+    else:
+        with open(ZIPPATH, mode='w') as f:
+            f.write(base64.b64decode(ZIP_CONTENT))
+
+
+def create_protected_zip():
+    z = ZipFile(ZIPPATH, mode='w', password=ZIP2_PWD)
+    z.writestr(ITEM_NAME, ITEM_CONTENT)
+    z.close()
+
+
+class TestProtectedReading(unittest.TestCase):
+    def setUp(self):
+        create_file_from_content()
+
+
+    def tearDown(self):
+        os.remove(ZIPPATH)
+
+    def test_read_with_password(self):
+        z = ZipFile(ZIPPATH, 'r', password=ZIP1_PWD)
+        if PY3:
+            self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
+        else:
+            self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        z.close()
+
+    def test_read_without_password(self):
+        z = ZipFile(ZIPPATH, 'r')
+        self.assertRaises(RuntimeError, z.read, ITEM_NAME)
+        z.close()
+
+    def test_read_with_wrong_password(self):
+        z = ZipFile(ZIPPATH, 'r', password='wrong')
+        self.assertRaises(RuntimeError, z.read, ITEM_NAME)
+        z.close()
+
+class TestProtectedWriting(unittest.TestCase):
+    def setUp(self):
+        create_protected_zip()
+
+    def tearDown(self):
+        os.remove(ZIPPATH)
+
+    def test_read_with_password(self):
+        z = ZipFile(ZIPPATH, 'r', password=ZIP2_PWD)
+        if PY3:
+            self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
+        else:
+            self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        z.close()
+
+    def test_read_without_password(self):
+        z = ZipFile(ZIPPATH, 'r')
+        self.assertRaises(RuntimeError, z.read, ITEM_NAME)
+        z.close()
+
+    def test_read_with_wrong_password(self):
+        z = ZipFile(ZIPPATH, 'r', password='wrong')
+        self.assertRaises(RuntimeError, z.read, ITEM_NAME)
+        z.close()
+
+    def test_read_with_password_list(self):
+        z = ZipFile(ZIPPATH, 'r', password=[ZIP1_PWD, ZIP2_PWD])
+        if PY3:
+            self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
+        else:
+            self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        z.close()
+
+
+
 class TestHighLevelAPI(unittest.TestCase):
     def setUp(self):
         make_temp_archive()
 
     def _test_listing_content(self, f):
-        """ Test helper capturing file paths while iterating the archive. """
+        """Test helper capturing file paths while iterating the archive."""
         found = []
         with Archive(f) as a:
             for entry in a:
@@ -260,16 +358,16 @@ class TestHighLevelAPI(unittest.TestCase):
         self.assertEqual(set(found), set(FILENAMES))
 
     def test_open_by_name(self):
-        """ Test an archive opened directly by name. """
+        """Test an archive opened directly by name."""
         self._test_listing_content(ZIPPATH)
 
     def test_open_by_named_fobj(self):
-        """ Test an archive using a file-like object opened by name. """
+        """Test an archive using a file-like object opened by name."""
         with open(ZIPPATH, 'rb') as f:
             self._test_listing_content(f)
 
     def test_open_by_unnamed_fobj(self):
-        """ Test an archive using file-like object opened by fileno(). """
+        """Test an archive using file-like object opened by fileno()."""
         with open(ZIPPATH, 'rb') as zf:
             with io.FileIO(zf.fileno(), mode='r', closefd=False) as f:
                 self._test_listing_content(f)

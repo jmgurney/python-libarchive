@@ -1,13 +1,12 @@
 import os
 from libarchive import is_archive, Entry, SeekableArchive
-from tarfile import DEFAULT_FORMAT, USTAR_FORMAT, GNU_FORMAT, PAX_FORMAT, \
-    ENCODING
+from tarfile import DEFAULT_FORMAT, USTAR_FORMAT, GNU_FORMAT, PAX_FORMAT, ENCODING
 from tarfile import REGTYPE, SYMTYPE, DIRTYPE, FIFOTYPE, CHRTYPE, BLKTYPE
 
 FORMAT_CONVERSION = {
-    USTAR_FORMAT:       'tar',
-    GNU_FORMAT:         'gnu',
-    PAX_FORMAT:         'pax',
+    USTAR_FORMAT: 'tar',
+    GNU_FORMAT: 'gnu',
+    PAX_FORMAT: 'pax',
 }
 
 
@@ -36,9 +35,13 @@ class TarInfo(Entry):
     @property
     def get_type(self):
         for attr, type in (
-                ('isdir', DIRTYPE), ('isfile', REGTYPE), ('issym', SYMTYPE),
-                ('isfifo', FIFOTYPE), ('ischr', CHRTYPE), ('isblk', BLKTYPE),
-            ):
+            ('isdir', DIRTYPE),
+            ('isfile', REGTYPE),
+            ('issym', SYMTYPE),
+            ('isfifo', FIFOTYPE),
+            ('ischr', CHRTYPE),
+            ('isblk', BLKTYPE),
+        ):
             if getattr(self, attr)():
                 return type
 
@@ -52,13 +55,12 @@ class TarInfo(Entry):
 
 
 class TarFile(SeekableArchive):
-    getmember   = SeekableArchive.getentry
-    list        = SeekableArchive.printlist
-    extract     = SeekableArchive.readpath
+    getmember = SeekableArchive.getentry
+    list = SeekableArchive.printlist
+    extract = SeekableArchive.readpath
     extractfile = SeekableArchive.readstream
 
-    def __init__(self, name=None, mode='r', fileobj=None,
-                 format=DEFAULT_FORMAT, tarinfo=TarInfo, encoding=ENCODING):
+    def __init__(self, name=None, mode='r', fileobj=None, format=DEFAULT_FORMAT, tarinfo=TarInfo, encoding=ENCODING):
         if name:
             f = name
         elif fileobj:
@@ -67,8 +69,7 @@ class TarFile(SeekableArchive):
             format = FORMAT_CONVERSION.get(format)
         except KeyError:
             raise Exception('Invalid tar format: %s' % format)
-        super(TarFile, self).__init__(f, mode=mode, format=format,
-                                      entry_class=tarinfo, encoding=encoding)
+        super(TarFile, self).__init__(f, mode=mode, format=format, entry_class=tarinfo, encoding=encoding)
 
     def getmembers(self):
         return list(self)
@@ -78,7 +79,7 @@ class TarFile(SeekableArchive):
 
     def __next__(self):
         raise NotImplementedError
-        pass # TODO: how to do this?
+        pass  # TODO: how to do this?
 
     def extract(self, member, path=None):
         if path is None:
@@ -90,7 +91,7 @@ class TarFile(SeekableArchive):
         return self.readpath(member, f)
 
     def add(self, name, arcname, recursive=True, exclude=None, filter=None):
-        pass # TODO: implement this.
+        pass  # TODO: implement this.
 
     def addfile(self, tarinfo, fileobj):
         return self.writepath(fileobj, tarinfo)
