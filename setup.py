@@ -48,12 +48,10 @@ else:
 
 
 name = 'python-libarchive'
-version = '4.1.0'
-release = '1'
-versrel = version + '-' + release
+version = '4.1.1'
 readme = 'README.rst'
 download_url = "http://" + name + ".googlecode.com/files/" + name + "-" + \
-                                                          versrel + ".tar.gz"
+                                                          version + ".tar.gz"
 repourl = 'https://github.com/smartfile/python-libarchive'
 long_description = open(readme).read()
 
@@ -101,7 +99,7 @@ __libarchive = Extension(
 
 setup(
     name=name,
-    version=versrel,
+    version=version,
     description='A libarchive wrapper for Python supporting password protection.',
     long_description=long_description,
     license='BSD-style license',
