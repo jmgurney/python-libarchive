@@ -91,7 +91,7 @@ else:
 
 __libarchive = Extension(
     name='libarchive.__libarchive',
-    sources=['libarchive/_libarchive.i'],
+    sources=['libarchive/_libarchive_wrap.c'],
     libraries=['archive'],
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
