@@ -307,7 +307,6 @@ class Entry(object):
 
     def __init__(self, pathname=None, size=None, mtime=None, mode=None, hpos=None, encoding=ENCODING):
 
-        # , symlink=None
         self.pathname = pathname
         self.size = size
         self.mtime = mtime
