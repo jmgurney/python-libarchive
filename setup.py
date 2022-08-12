@@ -87,7 +87,7 @@ if libarchivePrefix:
     environ['LDFLAGS'] = '-L{0}/lib {1}'.format(libarchivePrefix, environ.get('LDFLAGS', ''))
 else:
     extra_compile_args = []
-    extra_link_args = ['-l:libarchive.so.18']
+    extra_link_args = ['-l:libarchive.so']
 
 __libarchive = Extension(
     name='libarchive.__libarchive',
