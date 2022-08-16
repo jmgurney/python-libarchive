@@ -1,10 +1,15 @@
-.. image:: https://travis-ci.org/smartfile/python-libarchive.svg
-    :target: https://travis-ci.org/smartfile/python-libarchive
+|ci| |pypi|
 
-A `SmartFile`_ Open Source project. `Read more`_ about how SmartFile
-uses and contributes to Open Source software.
+.. |ci| image:: https://github.com/smartfile/python-libarchive/actions/workflows/ci.yml/badge.svg
 
-.. figure:: http://www.smartfile.com/images/logo.jpg
+.. |pypi| image:: https://img.shields.io/pypi/v/python-libarchive
+   :target: https://pypi.org/project/python-libarchive
+
+A `SmartFile`_ Open Source project.
+
+.. figure:: https://www.smartfile.com/assets/img/logos/smartfile-logo-secondary.png
+   :target: SmartFile_
+   :width: 400
    :alt: SmartFile
 
 Overview
