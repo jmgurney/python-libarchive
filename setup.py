@@ -50,8 +50,6 @@ else:
 name = 'python-libarchive'
 version = '4.1.1'
 readme = 'README.rst'
-download_url = "http://" + name + ".googlecode.com/files/" + name + "-" + \
-                                                          version + ".tar.gz"
 repourl = 'https://github.com/smartfile/python-libarchive'
 long_description = open(readme).read()
 
@@ -105,9 +103,8 @@ setup(
     license='BSD-style license',
     platforms=['any'],
     author='Vadim Lebedev, Ben Timby, Travis Cunningham, Ryan Johnston, SmartFile',
-    author_email='vadiml1024@gmail.com',
+    author_email='tech@smartfile.com',
     url=repourl,
-    download_url=download_url,
     packages=['libarchive'],
     classifiers=[
         'Development Status :: 4 - Beta',
