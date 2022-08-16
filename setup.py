@@ -79,7 +79,7 @@ class build_ext_extra(build_ext, object):
 
 if libarchivePrefix:
     extra_compile_args = ['-I{0}/include'.format(libarchivePrefix)]
-    extra_link_args = ['-Wl,-rpath={0}/lib'.format(libarchivePrefix)]
+    extra_link_args = ['-Wl,-rpath,{0}/lib'.format(libarchivePrefix)]
     environ['LDFLAGS'] = '-L{0}/lib {1}'.format(libarchivePrefix, environ.get('LDFLAGS', ''))
 else:
     extra_compile_args = []
