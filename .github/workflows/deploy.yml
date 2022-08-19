@@ -26,11 +26,11 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
-         python_version: ${{ matrix.python_version }}
+         python-version: ${{ matrix.python_version }}
     - name: Install python tools
       run: |
         python3 -m pip install auditwheel
-    
+
     - name: Build libarchive C sources
       run: |
         cd /tmp
@@ -58,4 +58,4 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
-        wheel_files: wheelhouse/*.whl  
+        packages_dir: wheelhouse/
