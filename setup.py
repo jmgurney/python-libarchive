@@ -48,7 +48,7 @@ else:
 
 
 name = 'python-libarchive'
-version = '4.2.0b1'
+version = '4.2.0'
 readme = 'README.rst'
 repourl = 'https://github.com/smartfile/python-libarchive'
 long_description = open(readme).read()
@@ -107,7 +107,7 @@ setup(
     url=repourl,
     packages=['libarchive'],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
         'Programming Language :: C',
