@@ -24,11 +24,10 @@ Libarchive supports the following:
  - Writes tar, pax, cpio, zip, xar, ar, ISO, mtree, and shar archives.
  - Automatically handles archives compressed with gzip, bzip2, lzip, xz, lzma, or compress.
 
-For information on installing libarchive and python-libarchive, see the `Building`_.
+For information on installing libarchive and python-libarchive, see `Building`_.
 
 .. _SmartFile: http://www.smartfile.com/
-.. _Read more: http://www.smartfile.com/open-source.html
-.. _Building: http://code.google.com/p/python-libarchive/wiki/Building
+.. _Building: https://github.com/smartfile/python-libarchive/tree/master#installing-libarchive
 
 
 Introduction
@@ -186,18 +185,18 @@ You should now be able to install libarchive.
 
    ::
 
-        $ wget http://libarchive.googlecode.com/files/libarchive-3.0.3.tar.gz
-        $ tar xzf libarchive-3.0.3.tar.gz
+        $ wget https://libarchive.org/downloads/libarchive-3.6.1.tar.gz
+        $ tar xzf libarchive-3.6.1.tar.gz
 
         # Configure using automake...
-        $ cd libarchive-3.0.3/
+        $ cd libarchive-3.6.1/
         $ build/autogen.sh
         $ ./configure --prefix=/usr/local
 
         # Or configure using cmake...
         $ mkdir build
         $ cd build
-        $ cmake -DCMAKE_INSTALL_PREFIX=/usr/local ../libarchive-3.0.3
+        $ cmake -DCMAKE_INSTALL_PREFIX=/usr/local ../libarchive-3.6.1
 
         # Now compile and install...
         $ make
@@ -210,7 +209,7 @@ Now that the library is installed, you need to tell ld where to find it. The eas
         $ sudo sh -c 'echo /usr/local/lib > /etc/ld.so.conf.d/libarchive3.conf'
         $ sudo ldconfig
 
-Now libarchive 3.0.3 is installed into /usr/local/. The next step is to build and install python-libarchive.
+Now libarchive 3.6.1 is installed into /usr/local/. The next step is to build and install python-libarchive.
 
 Installing python-libarchive
 ----------------------------
@@ -219,9 +218,9 @@ Now that libarchive is installed, you can install the python extension using the
 
    ::
 
-        $ wget http://python-libarchive.googlecode.com/files/python-libarchive-3.0.3-2.tar.gz
-        $ tar xzf python-libarchive-3.0.3-2.tar.gz
-        $ cd python-libarchive-3.0.3-2/
+        $ wget https://files.pythonhosted.org/packages/1b/ab/f7791f241675e5041a7e466f6990dcb0a58ff9fb7a3495644aef3612ba40/python-libarchive-4.2.0.tar.gz
+        $ tar xzf python-libarchive-4.2.0.tar.gz
+        $ cd python-libarchive-4.2.0/
         $ sudo python setup.py install
 
 You can also install using pip.
@@ -230,7 +229,7 @@ You can also install using pip.
 
         $ pip install python-libarchive
 
-setup.py will explicitly link against version 3.0.3 of the library.
+setup.py will explicitly link against version 3.6.1 of the library.
 
 Hacking / Running the Test Suite
 --------------------------------
