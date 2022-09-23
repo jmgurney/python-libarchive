@@ -33,8 +33,6 @@ import io
 from libarchive import Archive, is_archive_name, is_archive
 from libarchive.zip import is_zipfile, ZipFile, ZipEntry
 
-PY3 = sys.version_info[0] == 3
-
 TMPDIR = tempfile.mkdtemp(suffix='.python-libarchive')
 ZIPFILE = 'test.zip'
 ZIPPATH = os.path.join(TMPDIR, ZIPFILE)
@@ -204,10 +202,7 @@ class TestZipWrite(unittest.TestCase):
                 data = i.read(1)
                 if not data:
                     break
-                if PY3:
-                    o.write(data)
-                else:
-                    o.write(unicode(data))
+                o.write(data)
             o.close()
             i.close()
         z.close()
@@ -222,10 +217,7 @@ class TestZipWrite(unittest.TestCase):
                 data = i.read(1)
                 if not data:
                     break
-                if PY3:
-                    o.write(data)
-                else:
-                    o.write(unicode(data))
+                o.write(data)
             o.close()
             i.close()
         z.close()
@@ -237,10 +229,7 @@ class TestZipWrite(unittest.TestCase):
         z.close()
         self.assertIsNotNone(z._a)
         self.assertIsNotNone(z._stream)
-        if PY3:
-            o.write('testdata')
-        else:
-            o.write(unicode('testdata'))
+        o.write('testdata')
         o.close()
         self.assertIsNone(z._a)
         self.assertIsNone(z._stream)
@@ -269,12 +258,8 @@ ITEM_NAME='test.txt'
 ZIP1_PWD='pwd'
 ZIP2_PWD='12345'
 def create_file_from_content():
-    if PY3:
-        with open(ZIPPATH, mode='wb') as f:
-            f.write(base64.b64decode(ZIP_CONTENT))
-    else:
-        with open(ZIPPATH, mode='w') as f:
-            f.write(base64.b64decode(ZIP_CONTENT))
+    with open(ZIPPATH, mode='wb') as f:
+        f.write(base64.b64decode(ZIP_CONTENT))
 
 
 def create_protected_zip():
@@ -293,10 +278,7 @@ class TestProtectedReading(unittest.TestCase):
 
     def test_read_with_password(self):
         z = ZipFile(ZIPPATH, 'r', password=ZIP1_PWD)
-        if PY3:
-            self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
-        else:
-            self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
         z.close()
 
     def test_read_without_password(self):
@@ -318,10 +300,7 @@ class TestProtectedWriting(unittest.TestCase):
 
     def test_read_with_password(self):
         z = ZipFile(ZIPPATH, 'r', password=ZIP2_PWD)
-        if PY3:
-            self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
-        else:
-            self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
         z.close()
 
     def test_read_without_password(self):
@@ -336,10 +315,7 @@ class TestProtectedWriting(unittest.TestCase):
 
     def test_read_with_password_list(self):
         z = ZipFile(ZIPPATH, 'r', password=[ZIP1_PWD, ZIP2_PWD])
-        if PY3:
-            self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
-        else:
-            self.assertEqual(z.read(ITEM_NAME), ITEM_CONTENT)
+        self.assertEqual(z.read(ITEM_NAME), bytes(ITEM_CONTENT, 'utf-8'))
         z.close()
 
 
