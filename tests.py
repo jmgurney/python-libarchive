@@ -27,7 +27,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os, unittest, tempfile, random, string, sys
+import hashlib
 import io
+import pathlib
 import shutil
 import zipfile
 
@@ -367,6 +369,51 @@ class TestHighLevelAPI(unittest.TestCase, MakeTempMixIn):
         with open(self.ZIPPATH, 'rb') as zf:
             with io.FileIO(zf.fileno(), mode='r', closefd=False) as f:
                 self._test_listing_content(f)
+
+_defaulthash = 'sha512'
+
+def _readfp(fp):
+    while True:
+        r = fp.read(64*1024)
+        # libarchive returns None on EOF
+        if r == b'' or r is None:
+            return
+
+        yield r
+
+def _hashfp(fp):
+    hash = getattr(hashlib, _defaulthash)()
+    for r in _readfp(fp):
+        hash.update(r)
+
+    return '%s:%s' % (_defaulthash, hash.hexdigest())
+
+
+class TestArchive(unittest.TestCase):
+    def setUp(self):
+        self.fixtures = pathlib.Path(__file__).parent / 'fixtures'
+
+    def test_closed(self):
+        fname = self.fixtures / 'testfile.tar.gz'
+
+        with Archive(fname) as arch:
+            origfp = arch.f
+
+            hashes = []
+
+            for i in arch:
+                if not i.isfile():
+                    continue
+
+                with arch.readstream(i.size) as fp:
+                    hashes.append(_hashfp(fp))
+
+                self.assertTrue(fp.closed)
+                self.assertIsNone(arch._stream)
+
+            self.assertEqual(hashes, [ 'sha512:90f8342520f0ac57fb5a779f5d331c2fa87aa40f8799940257f9ba619940951e67143a8d746535ed0284924b2b7bc1478f095198800ba96d01847d7b56ca465c', 'sha512:7d5768d47b6bc27dc4fa7e9732cfa2de506ca262a2749cb108923e5dddffde842bbfee6cb8d692fb43aca0f12946c521cce2633887914ca1f96898478d10ad3f' ])
+
+        self.assertTrue(arch.f.closed)
 
 
 if __name__ == '__main__':

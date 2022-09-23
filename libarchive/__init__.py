@@ -24,6 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import pathlib
 import stat
 import sys
 import time
@@ -200,7 +201,7 @@ class EntryReadStream(object):
         return self
 
     def __exit__(self, *args):
-        return
+        self.close()
 
     def __iter__(self):
         if self.closed:
@@ -438,17 +439,20 @@ class Archive(object):
         self.encoding = encoding
         self.blocksize = blocksize
         self.password = password
+        if isinstance(f, pathlib.PurePath):
+            f = str(f)
         if isinstance(f, str):
             self.filename = f
             f = open(f, mode)
             # Only close it if we opened it...
-            self._defer_close = True
+            self._doclose = True
         elif hasattr(f, 'fileno'):
             self.filename = getattr(f, 'name', None)
             # Leave the fd alone, caller should manage it...
-            self._defer_close = False
+            self._doclose = False
         else:
             raise Exception('Provided file is not path or open file.')
+        self._defer_close = False
         self.f = f
         self.mode = mode
         # Guess the format/filter from file name (if not provided)
@@ -493,7 +497,7 @@ class Archive(object):
         return self
 
     def __exit__(self, type, value, traceback):
-        self.denit()
+        self.close()
 
     def __del__(self):
         self.close()
@@ -563,7 +567,7 @@ class Archive(object):
                 if hasattr(self.f, "fileno"):
                     os.fsync(self.f.fileno())
             # and then close it, if we opened it...
-            if getattr(self, '_close', None):
+            if self._doclose and getattr(self.f, 'close', None):
                 self.f.close()
 
     @property
@@ -665,8 +669,6 @@ class SeekableArchive(Archive):
         self._stream = None
         # Convert file to open file. We need this to reopen the archive.
         mode = kwargs.setdefault('mode', 'r')
-        if isinstance(f, str):
-            f = open(f, mode)
         super(SeekableArchive, self).__init__(f, **kwargs)
         self.entries = []
         self.eof = False
