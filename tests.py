@@ -415,6 +415,16 @@ class TestArchive(unittest.TestCase):
 
         self.assertTrue(arch.f.closed)
 
+    def test_noclose(self):
+        fname = self.fixtures / 'testfile.tar.gz'
+
+        with open(fname) as fp:
+            with Archive(fp) as arch:
+                pass
+
+            self.assertFalse(fp.closed)
+
+        self.assertTrue(fp.closed)
 
 if __name__ == '__main__':
     unittest.main()
